@@ -1,0 +1,73 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@radashi-org/radashi@^12.3.1": "12.3.1",
+    "jsr:@std/assert@1": "1.0.10",
+    "jsr:@std/internal@^1.0.5": "1.0.5",
+    "npm:effect@^3.12.1": "3.12.1",
+    "npm:lodash@^4.17.21": "4.17.21",
+    "npm:telnet-client@^2.2.2": "2.2.2"
+  },
+  "jsr": {
+    "@radashi-org/radashi@12.3.1": {
+      "integrity": "8e9acefd36a3383dd4e2aa5f186e2cd8d79eae78bcd52e2d103fb58b4c41543e"
+    },
+    "@std/assert@1.0.10": {
+      "integrity": "59b5cbac5bd55459a19045d95cc7c2ff787b4f8527c0dd195078ff6f9481fbb3",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    }
+  },
+  "npm": {
+    "effect@3.12.1": {
+      "integrity": "sha512-aAZdh56Yp1ehOFYeMcHHctTtxfqm6kkOdZFTXK6Zf0QoaKKc1hPG6ocjrKOc0axE8JbG4eZw351ogNLrM4vo9w==",
+      "dependencies": [
+        "fast-check"
+      ]
+    },
+    "emitter-component@1.1.2": {
+      "integrity": "sha512-QdXO3nXOzZB4pAjM0n6ZE+R9/+kPpECA/XSELIcc54NeYVnBqIk+4DFiBgK+8QbV3mdvTG6nedl7dTYgO+5wDw=="
+    },
+    "fast-check@3.23.2": {
+      "integrity": "sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==",
+      "dependencies": [
+        "pure-rand"
+      ]
+    },
+    "lodash@4.17.21": {
+      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
+    },
+    "net@1.0.2": {
+      "integrity": "sha512-kbhcj2SVVR4caaVnGLJKmlk2+f+oLkjqdKeQlmUtz6nGzOpbcobwVIeSURNgraV/v3tlmGIX82OcPCl0K6RbHQ=="
+    },
+    "pure-rand@6.1.0": {
+      "integrity": "sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA=="
+    },
+    "stream@0.0.2": {
+      "integrity": "sha512-gCq3NDI2P35B2n6t76YJuOp7d6cN/C7Rt0577l91wllh0sY9ZBuw9KaSGqH/b0hzn3CWWJbpbW0W0WvQ1H/Q7g==",
+      "dependencies": [
+        "emitter-component"
+      ]
+    },
+    "telnet-client@2.2.2": {
+      "integrity": "sha512-avq5nytiMWvSMNLdx2HuLsdU0B3H6QNo51yZVj3PLiMyrUWGifaQWQ0UBWNJ2hZ+TFe+LSvkeImlBwR5mi7eIg==",
+      "dependencies": [
+        "net",
+        "stream"
+      ]
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@radashi-org/radashi@^12.3.1",
+      "jsr:@std/assert@1",
+      "npm:effect@^3.12.1",
+      "npm:lodash@^4.17.21",
+      "npm:telnet-client@^2.2.2"
+    ]
+  }
+}
