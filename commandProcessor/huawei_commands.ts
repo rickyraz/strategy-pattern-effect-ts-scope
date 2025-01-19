@@ -1,11 +1,12 @@
 // HUAWEI
 
+import { CommandExecutor, NetworkCommandProcessor } from "./_processor.ts";
 import type { CommandTemplate, Variables } from "./type.ts";
 // import { HuaweiCommandProcessor, CommandExecutor } from "./radashi_strategy.ts";
-import {
-	CommandExecutor,
-	NetworkCommandProcessor,
-} from "./radashi_strategy_1.ts";
+// import {
+// 	CommandExecutor,
+// 	NetworkCommandProcessor,
+// } from "./old/radashi_strategy_1.ts";
 
 // Inisialisasi processor dan executor
 const huaweiProcessor = new NetworkCommandProcessor();

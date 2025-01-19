@@ -34,5 +34,17 @@ export interface CommandProcessor {
 		variables: Record<string, unknown>,
 	): Record<string, string>;
 }
+export interface ServicePort {
+	vlan?: string | number;
+	user_vlan?: string | number;
+	svlan?: string | number;
+	tls_vlan?: string | number;
+}
 
-export type Variables = Record<string, string | number | boolean>;
+// export type Variables = Record<
+// 	string,
+// 	string | number | boolean | string[] | ServicePort[]
+// >;
+
+type VariableValue = string | number | boolean | string[] | ServicePort[];
+export type Variables = Record<string, VariableValue>;

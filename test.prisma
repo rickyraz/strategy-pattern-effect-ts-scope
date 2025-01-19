@@ -1,0 +1,180 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+enum RestaurantType {
+    MCD
+    KFC
+}
+
+// Model Utama Pesanan
+model Order {
+    id             String         @id @default(cuid())
+    orderNumber    String         @unique
+    status         String
+    restaurantType RestaurantType // enum: MCD, KFC
+
+    // Relasi ke Template dengan nama relasi yang spesifik
+    templateId String
+    template   OrderTemplate @relation("OrderToTemplate", fields: [templateId], references: [id])
+
+    // Relasi ke detail pesanan spesifik restoran
+    mcdOrder McdOrder?
+    kfcOrder KfcOrder?
+
+    // Metadata
+    createdAt DateTime @default(now())
+    // userId    String
+    // user      User     @relation(fields: [userId], references: [id])
+}
+
+// Struktur Pesanan McD
+model McdOrder {
+    id      String @id @default(cuid())
+    order   Order  @relation(fields: [orderId], references: [id])
+    orderId String @unique
+
+    // Relasi one-to-many ke items
+    burgers McdBurger[]
+    drinks  McdDrink[]
+}
+
+model McdBurger {
+    id         String   @id @default(cuid())
+    mcdOrder   McdOrder @relation(fields: [mcdOrderId], references: [id])
+    mcdOrderId String
+
+    name     String // Big Mac, Cheeseburger dll
+    size     String // Regular, Double
+    extras   String[] // Extra cheese, extra patty
+    quantity Int
+}
+
+model McdDrink {
+    id         String   @id @default(cuid())
+    mcdOrder   McdOrder @relation(fields: [mcdOrderId], references: [id])
+    mcdOrderId String
+
+    name     String // Coca Cola, Sprite
+    size     String // Small, Medium, Large
+    ice      String // Less ice, Normal ice
+    quantity Int
+}
+
+// Struktur Pesanan KFC
+model KfcOrder {
+    id      String @id @default(cuid())
+    order   Order  @relation(fields: [orderId], references: [id])
+    orderId String @unique
+
+    // Relasi one-to-many
+    chickens KfcChicken[]
+    sides    KfcSide[]
+}
+
+model KfcChicken {
+    id         String   @id @default(cuid())
+    kfcOrder   KfcOrder @relation(fields: [kfcOrderId], references: [id])
+    kfcOrderId String
+
+    type       String // Original, Crispy
+    pieces     Int // 1pc, 2pc, dll
+    spicyLevel String // Normal, Extra Spicy
+    quantity   Int
+}
+
+model KfcSide {
+    id         String   @id @default(cuid())
+    kfcOrder   KfcOrder @relation(fields: [kfcOrderId], references: [id])
+    kfcOrderId String
+
+    name     String // French Fries, Soup
+    size     String // Regular, Large
+    quantity Int
+}
+
+// ----------------------------------------------------------------------------------------------
+
+// Template untuk menu yang tersedia
+model OrderTemplate {
+    id             String         @id @default(cuid())
+    restaurantType RestaurantType
+    isActive       Boolean        @default(true)
+
+    // Relasi balik ke Order dengan nama relasi yang sama
+    orders Order[] @relation("OrderToTemplate")
+
+    // Template menu per restoran
+    mcdTemplate McdTemplate?
+    kfcTemplate KfcTemplate?
+}
+
+// Template Menu McD
+model McdTemplate {
+    id         String        @id @default(cuid())
+    template   OrderTemplate @relation(fields: [templateId], references: [id])
+    templateId String        @unique
+
+    // Daftar menu yang tersedia
+    burgerTypes McdBurgerType[]
+    drinkTypes  McdDrinkType[]
+}
+
+model McdBurgerType {
+    id         String      @id @default(cuid())
+    template   McdTemplate @relation(fields: [templateId], references: [id])
+    templateId String
+
+    name            String
+    availableSizes  String[] // Ukuran yang tersedia
+    price           Decimal
+    availableExtras String[] // Extra yang tersedia
+}
+
+model McdDrinkType {
+    id         String      @id @default(cuid())
+    template   McdTemplate @relation(fields: [templateId], references: [id])
+    templateId String
+
+    name            String
+    availableSizes  String[] // Ukuran yang tersedia
+    price           Decimal
+    availableExtras String[] // Extra yang tersedia
+}
+
+// Template Menu KFC
+model KfcTemplate {
+    id         String        @id @default(cuid())
+    template   OrderTemplate @relation(fields: [templateId], references: [id])
+    templateId String        @unique
+
+    chickenTypes KfcChickenType[]
+    sideTypes    KfcSideType[]
+}
+
+model KfcChickenType {
+    id         String      @id @default(cuid())
+    template   KfcTemplate @relation(fields: [templateId], references: [id])
+    templateId String
+
+    type            String
+    availablePieces Int[] // 1,2,3 pieces
+    spicyLevels     String[] // Level spicy yang tersedia
+    price           Decimal
+}
+
+model KfcSideType {
+    id         String      @id @default(cuid())
+    template   KfcTemplate @relation(fields: [templateId], references: [id])
+    templateId String
+
+    type            String
+    availablePieces Int[] // 1,2,3 pieces
+    spicyLevels     String[] // Level spicy yang tersedia
+    price           Decimal
+}

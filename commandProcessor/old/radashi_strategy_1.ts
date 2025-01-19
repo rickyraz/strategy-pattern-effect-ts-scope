@@ -12,7 +12,7 @@ import type {
 	CommandProcessor,
 	VariableCondition,
 	VariableSwitch,
-} from "./type.ts";
+} from "../type.ts";
 
 import { Effect } from "effect";
 
@@ -27,6 +27,25 @@ export class NetworkCommandProcessor implements CommandProcessor {
 		return value.type === "conditional";
 	}
 
+	// private processSwitch = (
+	// 	value: VariableSwitch,
+	// 	variables: Record<string, unknown>,
+	// 	_key: string,
+	// ): string => {
+	// 	const switchValue = String(get(variables, value.variable, ""));
+	// 	const caseValue = value.cases[switchValue] || value.cases.default;
+
+	// 	if (typeof caseValue === "string") {
+	// 		return template(caseValue, variables);
+	// 	}
+
+	// 	const nestedCondition = get(variables, caseValue.condition, false);
+	// 	return template(
+	// 		nestedCondition ? caseValue.trueValue : caseValue.falseValue,
+	// 		variables,
+	// 	);
+	// };
+
 	private processSwitch = (
 		value: VariableSwitch,
 		variables: Record<string, unknown>,
@@ -36,14 +55,24 @@ export class NetworkCommandProcessor implements CommandProcessor {
 		const caseValue = value.cases[switchValue] || value.cases.default;
 
 		if (typeof caseValue === "string") {
-			return template(caseValue, variables);
+			const processedTemplate = template(caseValue, variables);
+			// Process nested template variables
+			const nestedTemplate = this.processTemplate(processedTemplate, variables);
+			return nestedTemplate;
 		}
 
-		const nestedCondition = get(variables, caseValue.condition, false);
-		return template(
-			nestedCondition ? caseValue.trueValue : caseValue.falseValue,
-			variables,
-		);
+		// Handle nested conditional
+		if (this.isConditional(caseValue)) {
+			const program = this.validateConditional(caseValue, variables, _key);
+			return Effect.runSync(
+				Effect.catchAll(program, (error) => {
+					console.error("Nested conditional validation failed:", error);
+					return Effect.succeed("");
+				}),
+			);
+		}
+
+		return ""; // Default return jika tidak ada case yang cocok
 	};
 
 	// Effect untuk validasi template
@@ -167,5 +196,13 @@ export class CommandExecutor {
 			...variables,
 			...processedVariables,
 		});
+	}
+
+	executeCommandAsArray(commandName: string, variables: Variables): string[] {
+		const output = this.executeCommand(commandName, variables);
+		return output
+			.split("\n")
+			.map((line) => line.trim())
+			.filter(Boolean); // Remove empty lines
 	}
 }

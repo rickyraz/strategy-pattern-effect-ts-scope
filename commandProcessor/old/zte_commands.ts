@@ -3,7 +3,7 @@ import {
 	CommandExecutor,
 	NetworkCommandProcessor,
 } from "./radashi_strategy_1.ts";
-import type { CommandTemplate, Variables } from "./type.ts";
+import type { CommandTemplate, Variables } from "../type.ts";
 
 // Command template untuk ZTE
 const zteCommands: CommandTemplate[] = [
