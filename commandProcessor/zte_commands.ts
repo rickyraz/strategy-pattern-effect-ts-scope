@@ -211,8 +211,6 @@ const regularConfig: ONTBaseConfig = {
 	desc: "FMI-123",
 	service_name: "Internet_Vlan-Translate", // Single input for all names // This will be used for tcont_name, gemport_name and service_name
 	bandwidth_profile: "200M",
-	// tcont_index: "1",
-	// gemport_index: "1",
 	tcont_gemport_index: "1",
 	port_mode: "tag",
 	eth_count: 2,
@@ -220,89 +218,97 @@ const regularConfig: ONTBaseConfig = {
 		{
 			vlan: "1440",
 			user_vlan: "1440",
+			svlan: "3000", // PPPoE (vman)
+			tls_vlan: "",
 		},
-	],
-};
-
-// VMAN dengan service ports
-const vmanConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	service_name: "Internet_Vlan-Translate", // Single input for all names // This will be used for tcont_name, gemport_name and service_name
-	bandwidth_profile: "200M",
-	tcont_gemport_index: "1",
-	port_mode: "trunk",
-	eth_count: 2,
-	service_ports: [
-		{
-			vlan: "1440",
-			user_vlan: "1440",
-			svlan: "3170",
-		},
-	],
-};
-
-// QINQ Config dengan service ports
-const qinqConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	tcont_gemport_index: "1",
-
-	bandwidth_profile: "200M",
-
-	service_name: "QINQ-Service",
-	service_ports: [
-		{
-			tls_vlan: "3000",
-		},
-	],
-};
-
-// PPPOE Config dengan service ports
-const pppoeConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	tcont_gemport_index: "1",
-
-	bandwidth_profile: "200M",
-	service_name: "PPPOE-Service",
-	service_ports: [
 		{
 			vlan: "400",
-			svlan: "3000",
-		},
-		{
-			vlan: "499",
-			svlan: "3000",
-		},
-		{
-			vlan: "9090",
-			svlan: "3000",
+			user_vlan: "1440",
+			svlan: "3000", // PPPoE (vman)
+			tls_vlan: "",
 		},
 	],
 };
+
+// // VMAN dengan service ports
+// const vmanConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123", // name pengguna
+// 	service_name: "Internet_Vlan-Translate",// system kalau milih QINQ
+// 	bandwidth_profile: "200M",  // milih
+// 	tcont_gemport_index: "1",
+// 	port_mode: "trunk",  // milih
+// 	eth_count: 2,
+// 	service_ports: [ // milih
+// 		{
+// 			vlan: "1440",
+// 			user_vlan: "1440",
+// 			svlan: "3170",
+// 		},
+// 	],
+// };
+
+// // QINQ Config dengan service ports
+// const qinqConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123", // name pengguna
+// 	tcont_gemport_index: "1", // system pasti 1
+
+// 	bandwidth_profile: "200M", // milih
+
+// 	service_name: "QINQ-Service", // system kalau milih QINQ
+// 	service_ports: [
+// 		{
+// 			tls_vlan: "3000", // milih
+// 		},
+// 	],
+// };
+
+// // PPPOE Config dengan service ports
+// const pppoeConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123",
+// 	tcont_gemport_index: "1",
+
+// 	bandwidth_profile: "200M",
+// 	service_name: "PPPOE-Service",
+// 	service_ports: [
+// 		{
+// 			vlan: "400",
+// 			svlan: "3000",
+// 		},
+// 		{
+// 			vlan: "499",
+// 			svlan: "3000",
+// 		},
+// 		{
+// 			vlan: "9090",
+// 			svlan: "3000",
+// 		},
+// 	],
+// };
 
 // Test semua konfigurasi
 const regularResult = ontService.generateConfig(regularConfig);
-const vmanResult = ontService.generateConfig(vmanConfig);
-const qinqResult = ontService.generateConfig(qinqConfig);
-const pppoeResult = ontService.generateConfig(pppoeConfig);
+// const vmanResult = ontService.generateConfig(vmanConfig);
+// const qinqResult = ontService.generateConfig(qinqConfig);
+// const pppoeResult = ontService.generateConfig(pppoeConfig);
 
 // Print results
-console.log("=== ACCESS VLAN Config ===");
+console.log("=== Config ===");
 console.log(regularResult);
-console.log("\n=== ACCESS VMAN Config ===");
-console.log(vmanResult);
-console.log("\n=== QINQ Config ===");
-console.log(qinqResult);
-console.log("\n=== PPPOE Config ===");
-console.log(pppoeResult);
+// console.log("\n=== ACCESS VMAN Config ===");
+// console.log(vmanResult);
+// console.log("\n=== QINQ Config ===");
+// console.log(qinqResult);
+// console.log("\n=== PPPOE Config ===");
+// console.log(pppoeResult);

@@ -3,15 +3,12 @@ import { CommandExecutor, NetworkCommandProcessor } from "./_processor.ts";
 import type { CommandTemplate, ServicePort, Variables } from "./type.ts";
 
 export interface ONTBaseConfig {
-	f: string;
-	s: string;
-	p: string;
-	ont_id: string;
+	fsp: string;
+	onuId: string;
 	desc: string;
-	tcont_index: string;
+	tcont_gemport_index: string; // Combined index for both tcont and gemport
 	service_name: string; // This will be used for tcont_name, gemport_name and service_name
 	bandwidth_profile: string;
-	gemport_index: string;
 	service_ports?: Array<ServicePort>;
 	eth_count?: number;
 	vlan?: string;
@@ -27,7 +24,7 @@ export const zteTemplate: CommandTemplate = {
 	type: "CREATE",
 	description: "Command to create complete ONT configuration ZTE",
 	template:
-		"interface gpon-onu_{{f}}/{{s}}/{{p}}:{{ont_id}}\nname {{desc}}\ndescription {{desc}}\ntcont {{tcont_index}} name {{service_name}} profile {{bandwidth_profile}}\ngemport {{gemport_index}} name {{service_name}} tcont {{tcont_index}}\n{{service_ports_config}}\nexit\n\n{{service_config}}",
+		"interface gpon-onu_{{fsp}}:{{onuId}}\nname {{desc}}\ndescription {{desc}}\ntcont {{tcont_gemport_index}} name {{service_name}} profile {{bandwidth_profile}}\ngemport {{tcont_gemport_index}} name {{service_name}} tcont {{tcont_gemport_index}}\n{{service_ports_config}}\nexit\n\n{{service_config}}",
 	variableLogic: {
 		service_ports_config: {
 			type: "switch",
@@ -44,11 +41,11 @@ export const zteTemplate: CommandTemplate = {
 			variable: "service_type",
 			cases: {
 				pppoe:
-					"pon-onu-mng gpon-onu_{{f}}/{{s}}/{{p}}:{{ont_id}}\nflow mode 1 tag-filter vlan-filter untag-filter discard\n{{pppoe_service_ports_flow}}\ngemport {{gemport_index}} flow 1",
-				qinq: "pon-onu-mng gpon-onu_{{f}}/{{s}}/{{p}}:{{ont_id}}\nservice qinq gemport {{gemport_index}} iphost 1\nvlan port eth_0/1 vlan all",
-				vman: "pon-onu-mng gpon-onu_{{f}}/{{s}}/{{p}}:{{ont_id}}\nservice {{service_name}} gemport {{gemport_index}} vlan {{vlan}}{{generated_ports}}",
+					"pon-onu-mng gpon-onu_{{fsp}}:{{onuId}}\nflow mode 1 tag-filter vlan-filter untag-filter discard\n{{pppoe_service_ports_flow}}\ngemport {{tcont_gemport_index}} flow 1",
+				qinq: "pon-onu-mng gpon-onu_{{fsp}}:{{onuId}}\nservice qinq gemport {{tcont_gemport_index}} iphost 1\nvlan port eth_0/1 vlan all",
+				vman: "pon-onu-mng gpon-onu_{{fsp}}:{{onuId}}\nservice {{service_name}} gemport {{tcont_gemport_index}} vlan {{vlan}}{{generated_ports}}",
 				default:
-					"pon-onu-mng gpon-onu_{{f}}/{{s}}/{{p}}:{{ont_id}}\nservice {{service_name}} gemport {{gemport_index}} vlan {{vlan}}{{generated_ports}}",
+					"pon-onu-mng gpon-onu_{{fsp}}:{{onuId}}\nservice {{service_name}} gemport {{tcont_gemport_index}} vlan {{vlan}}{{generated_ports}}",
 			},
 		},
 	},
@@ -205,104 +202,109 @@ const ontService = new ZTEONTConfigCommand();
 
 // Regular VLAN dengan service ports
 const regularConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
+	fsp: "1/12/1",
+	onuId: "2",
 	desc: "FMI-123",
-	tcont_index: "1",
-	service_name: "Internet_Vlan-Translate", // Single input for all names // This will be used for tcont_name, gemport_name and service_name
+	service_name: "Internet_Vlan-Translate",
 	bandwidth_profile: "200M",
-	gemport_index: "1",
+	tcont_gemport_index: "1",
 	port_mode: "tag",
-	eth_count: 2,
+	eth_count: 4,
 	service_ports: [
 		{
-			vlan: "1440",
-			user_vlan: "1440",
+			vlan: "244",
+			user_vlan: "244",
+			svlan: "", // PPPoE (vman)
+			tls_vlan: "", // QINQ (vman)
+		},
+		{
+			vlan: "241",
+			user_vlan: "241",
+			svlan: "", // PPPoE (vman)
+			tls_vlan: "", // QINQ (vman)
 		},
 	],
 };
 
-// VMAN dengan service ports
-const vmanConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	tcont_index: "1",
-	service_name: "Internet_Vlan-Translate", // Single input for all names // This will be used for tcont_name, gemport_name and service_name
-	bandwidth_profile: "200M",
-	gemport_index: "1",
-	port_mode: "trunk",
-	eth_count: 2,
-	service_ports: [
-		{
-			vlan: "1440",
-			user_vlan: "1440",
-			svlan: "3170",
-		},
-	],
-};
+// // VMAN dengan service ports
+// const vmanConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123", // name pengguna
+// 	service_name: "Internet_Vlan-Translate",// system kalau milih QINQ
+// 	bandwidth_profile: "200M",  // milih
+// 	tcont_gemport_index: "1",
+// 	port_mode: "trunk",  // milih
+// 	eth_count: 2,
+// 	service_ports: [ // milih
+// 		{
+// 			vlan: "1440",
+// 			user_vlan: "1440",
+// 			svlan: "3170",
+// 		},
+// 	],
+// };
 
-// QINQ Config dengan service ports
-const qinqConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	tcont_index: "1",
-	bandwidth_profile: "200M",
-	gemport_index: "1",
-	service_name: "QINQ-Service",
-	service_ports: [
-		{
-			tls_vlan: "3000",
-		},
-	],
-};
+// // QINQ Config dengan service ports
+// const qinqConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123", // name pengguna
+// 	tcont_gemport_index: "1", // system pasti 1
 
-// PPPOE Config dengan service ports
-const pppoeConfig: ONTBaseConfig = {
-	f: "1",
-	s: "1",
-	p: "4",
-	ont_id: "1",
-	desc: "FMI-123",
-	tcont_index: "1",
-	bandwidth_profile: "200M",
-	gemport_index: "1",
-	service_name: "PPPOE-Service",
-	service_ports: [
-		{
-			vlan: "400",
-			svlan: "3000",
-		},
-		{
-			vlan: "499",
-			svlan: "3000",
-		},
-		{
-			vlan: "9090",
-			svlan: "3000",
-		},
-	],
-};
+// 	bandwidth_profile: "200M", // milih
+
+// 	service_name: "QINQ-Service", // system kalau milih QINQ
+// 	service_ports: [
+// 		{
+// 			tls_vlan: "3000", // milih
+// 		},
+// 	],
+// };
+
+// // PPPOE Config dengan service ports
+// const pppoeConfig: ONTBaseConfig = {
+// 	f: "1",
+// 	s: "1",
+// 	p: "4",
+// 	ont_id: "1",
+// 	desc: "FMI-123",
+// 	tcont_gemport_index: "1",
+
+// 	bandwidth_profile: "200M",
+// 	service_name: "PPPOE-Service",
+// 	service_ports: [
+// 		{
+// 			vlan: "400",
+// 			svlan: "3000",
+// 		},
+// 		{
+// 			vlan: "499",
+// 			svlan: "3000",
+// 		},
+// 		{
+// 			vlan: "9090",
+// 			svlan: "3000",
+// 		},
+// 	],
+// };
 
 // Test semua konfigurasi
 const regularResult = ontService.generateConfig(regularConfig);
-const vmanResult = ontService.generateConfig(vmanConfig);
-const qinqResult = ontService.generateConfig(qinqConfig);
-const pppoeResult = ontService.generateConfig(pppoeConfig);
+// const vmanResult = ontService.generateConfig(vmanConfig);
+// const qinqResult = ontService.generateConfig(qinqConfig);
+// const pppoeResult = ontService.generateConfig(pppoeConfig);
 
 // Print results
-console.log("=== ACCESS VLAN Config ===");
+console.log("=== Config ===");
 console.log(regularResult);
-console.log("\n=== ACCESS VMAN Config ===");
-console.log(vmanResult);
-console.log("\n=== QINQ Config ===");
-console.log(qinqResult);
-console.log("\n=== PPPOE Config ===");
-console.log(pppoeResult);
+// console.log("\n=== ACCESS VMAN Config ===");
+// console.log(vmanResult);
+// console.log("\n=== QINQ Config ===");
+// console.log(qinqResult);
+// console.log("\n=== PPPOE Config ===");
+// console.log(pppoeResult);

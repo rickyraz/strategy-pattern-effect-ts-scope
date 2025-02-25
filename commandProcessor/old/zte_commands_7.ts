@@ -1,6 +1,6 @@
 // deno-lint-ignore-file
-import { CommandExecutor, NetworkCommandProcessor } from "./_processor.ts";
-import type { CommandTemplate, ServicePort, Variables } from "./type.ts";
+import { CommandExecutor, NetworkCommandProcessor } from "../_processor.ts";
+import type { CommandTemplate, ServicePort, Variables } from "../type.ts";
 
 export interface ONTBaseConfig {
 	f: string;
